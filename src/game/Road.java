@@ -47,8 +47,9 @@ public class Road extends JPanel implements ActionListener {
 	private int hit = 0;
 	private int health = 3;
 	private int packNum = 5000;
-	private int pedNum = 25;
+	private int pedNum = 200;
 	private boolean ingame;
+	private int destroyedPeds = 0;
 	
 	private final int B_WIDTH = 1000;
 	private final int B_HEIGHT = 1200;
@@ -68,38 +69,7 @@ public class Road extends JPanel implements ActionListener {
 		setBackground(Color.gray);
 		setFocusable(true);
 		
-		reset.addActionListener(new ActionListener() {
-
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-		        //your actions
-		    	initRoad();
-		    }
-		});
-		
-		quit.addActionListener(new ActionListener() {
-
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-		        //your actions
-		    	System.exit(0);
-		    }
-		});
-		
-		back.setVisible(false);
-		setLayout(new GridBagLayout());
-		back.setLayout(new BoxLayout(back, BoxLayout.Y_AXIS));
-		back.setBorder(new EmptyBorder(10, 10, 10, 10));
-		
-		gameOver.setAlignmentX(Component.CENTER_ALIGNMENT);
-		back.add(gameOver);
-		score.setAlignmentX(Component.CENTER_ALIGNMENT);
-		back.add(score);
-		reset.setAlignmentX(Component.CENTER_ALIGNMENT);
-		back.add(reset);
-		quit.setAlignmentX(Component.CENTER_ALIGNMENT);
-		back.add(quit);
-		add(back, new GridBagConstraints());
+		initBoard();
 		
 		ingame = true;
 		
@@ -132,7 +102,7 @@ public class Road extends JPanel implements ActionListener {
 		
 		for (int i = 0; i < packNum; i++) {
 			packages.add(new Package(getRandomNumberInRange(0, 900), (sY * i)));
-			System.out.println("Package #" + i + " (" + packages.get(i).getX() + ", " + packages.get(i).getY() + ")");
+//			System.out.println("Package #" + i + " (" + packages.get(i).getX() + ", " + packages.get(i).getY() + ")");
 		}
 		
 		System.out.println("Packages to pickup!: " + packages.size());
@@ -147,7 +117,7 @@ public class Road extends JPanel implements ActionListener {
 		
 		for (int i = 0; i < pedNum; i++) {
 			peds.add(new Pedestrian(getRandomNumberInRange(0, 900), (sY * i) - 100));
-			System.out.println("Package #" + i + " (" + peds.get(i).getX() + ", " + peds.get(i).getY() + ")");
+//			System.out.println("Pedestrian #" + i + " (" + peds.get(i).getX() + ", " + peds.get(i).getY() + ")");
 		}
 		
 		System.out.println("Pedestrians to avoid!: " + peds.size());
@@ -190,11 +160,20 @@ public class Road extends JPanel implements ActionListener {
 			}
 		}
 		
+		List<Missle> miss = truck.getMissles();
+		
+		for (Missle m : miss) {
+			if (m.isVisible()) {
+				g2d.drawImage(m.getImage(), m.getX(), m.getY(), this);
+			}
+		}
+		
 		g2d.drawImage(truck.getImage(), truck.getX(), truck.getY(), this);
 		
 		g.setColor(Color.WHITE);
         g.drawString("Packages collected: " + collected, 5, 15);
         g.drawString("Health Left: " + (health - hit), 5, 30);
+        g.drawString("Obstacles Destroyed: " + destroyedPeds, 5, 45);
 	}
 	
 	@Override
@@ -292,29 +271,34 @@ public class Road extends JPanel implements ActionListener {
 				inGame();
 			}
 		}
+		
+		List<Missle> miss = truck.getMissles();
+		
+		for (int i = 0; i < miss.size(); i++) {
+			Rectangle rM = new Rectangle(miss.get(i).getX(), miss.get(i).getY(), miss.get(i).getWidth(), miss.get(i).getHeight());
+			
+			if (miss.get(i).getY() < 0) {
+				miss.remove(i);
+			} else {
+				for (int k = 0; k < peds.size(); k++) {
+					Rectangle rP = new Rectangle(peds.get(k).getX(), peds.get(k).getY(), peds.get(k).getWidth(), peds.get(k).getHeight());
+					
+					if (rM.intersects(rP) || rP.intersects(rM)) {
+						peds.remove(k);
+						miss.get(i).setVisible(false);
+						destroyedPeds = destroyedPeds + 1;
+						playSound("destroyed_ped.wav");
+					}
+					
+				}
+				miss.get(i).move(collected);
+			}
+		}
 	}
 	
 	private void drawGameOver(Graphics g) throws MalformedURLException, UnsupportedAudioFileException, IOException, LineUnavailableException {
 		score.setText("<html><h1><font color='red'>Packages Collected: " + collected + "</font></h1></html>");
 		back.setVisible(true);
-//        String msg = "Game Over";
-//        Font small = new Font("Helvetica", Font.BOLD, 20);
-//        FontMetrics fm = getFontMetrics(small);
-//
-//        g.setColor(Color.red);
-//        
-//        //String score = "Packages Collected: " + collected;
-//        Font medium = new Font("Helvetica", Font.BOLD, 20);
-//        FontMetrics fm1 = getFontMetrics(medium);
-        
-//        g.setFont(small);
-//        g.drawString(msg, ((B_WIDTH - fm.stringWidth(msg)) / 2),
-//                (B_HEIGHT / 2) - 60);
-//        g.setFont(medium);
-//        g.drawString(score, ((B_WIDTH - fm1.stringWidth(score)) / 2),
-//                (B_HEIGHT / 2) - 40);
-        
-        
         
 		playSound("gameover.wav");
     }
@@ -355,4 +339,38 @@ public class Road extends JPanel implements ActionListener {
 		return r.nextInt((max - min) + 1) + min;
 	}
 	
+	public void initBoard() {
+		reset.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		        //your actions
+		    	initRoad();
+		    }
+		});
+		
+		quit.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		        //your actions
+		    	System.exit(0);
+		    }
+		});
+		
+		back.setVisible(false);
+		setLayout(new GridBagLayout());
+		back.setLayout(new BoxLayout(back, BoxLayout.Y_AXIS));
+		back.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		gameOver.setAlignmentX(Component.CENTER_ALIGNMENT);
+		back.add(gameOver);
+		score.setAlignmentX(Component.CENTER_ALIGNMENT);
+		back.add(score);
+		reset.setAlignmentX(Component.CENTER_ALIGNMENT);
+		back.add(reset);
+		quit.setAlignmentX(Component.CENTER_ALIGNMENT);
+		back.add(quit);
+		add(back, new GridBagConstraints());
+	}
 }

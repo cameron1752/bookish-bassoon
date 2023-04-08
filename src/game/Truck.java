@@ -2,7 +2,17 @@ package game;
 
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 
 public class Truck extends Sprite{
@@ -28,6 +38,10 @@ public class Truck extends Sprite{
 	// image uri
 	private String imgPath = "src/resources/truck.png";
 	
+	// missiles
+	private List<Missle> miss;
+
+	private int missles = 3;
 	
 	public Truck(int x, int y){
 		super(x, y);
@@ -36,6 +50,8 @@ public class Truck extends Sprite{
 	}
 	
 	private void initTruck() {
+
+		miss = new ArrayList<>();
 		loadImage();
 	}
 	
@@ -84,10 +100,37 @@ public class Truck extends Sprite{
 		return image;
 	}
 	
+	public void fire() {
+		 miss.add(new Missle(x + (w / 2), y + height / 2));
+		 try {
+			playSound("missle_shoot.wav");
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedAudioFileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (LineUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public List<Missle> getMissles(){
+		return miss;
+	}
+	
 	 public void keyPressed(KeyEvent e) {
 
         int key = e.getKeyCode();
-
+        
+        if (key == KeyEvent.VK_SPACE) {
+        	fire();
+        }
+        
         if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
             dx = -10;
         }
@@ -125,4 +168,12 @@ public class Truck extends Sprite{
             dy = 0;
         }
     }
+    
+	public void playSound(String soundFile) throws MalformedURLException, UnsupportedAudioFileException, IOException, LineUnavailableException {
+	    File f = new File("./src/resources/" + soundFile);
+	    AudioInputStream audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());  
+	    Clip clip = AudioSystem.getClip();
+	    clip.open(audioIn);
+	    clip.start();
+	}
 }
