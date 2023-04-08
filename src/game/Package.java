@@ -22,7 +22,7 @@ public class Package extends Sprite {
 		private Image image;
 		
 		// image uri
-		private String imgPath = "src/resources/package.png";
+		private String imgPath = "/package.png";
 		
 		
 		public Package(int x, int y) {
@@ -32,7 +32,8 @@ public class Package extends Sprite {
 		}
 		
 		private void loadImage() {
-			ImageIcon imgI = new ImageIcon(imgPath);
+			java.net.URL url = Road.class.getResource(imgPath);
+			ImageIcon imgI = new ImageIcon(url);
 			image = imgI.getImage();
 			
 			w = image.getWidth(null);

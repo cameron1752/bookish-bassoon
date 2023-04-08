@@ -22,7 +22,7 @@ public class Pedestrian extends Sprite {
 		private Image image;
 		
 		// image uri
-		private String imgPath = "src/resources/pedestrian.png";
+		private String imgPath = "/pedestrian.png";
 		
 		
 		public Pedestrian(int x, int y) {
@@ -32,7 +32,8 @@ public class Pedestrian extends Sprite {
 		}
 		
 		private void loadImage() {
-			ImageIcon imgI = new ImageIcon(imgPath);
+			java.net.URL url = Road.class.getResource(imgPath);
+			ImageIcon imgI = new ImageIcon(url);
 			image = imgI.getImage();
 			
 			w = image.getWidth(null);

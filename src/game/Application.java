@@ -12,7 +12,7 @@ public class Application extends JFrame{
 	private void initUI() {
 		add(new Road());
 		
-		setTitle("UPS Sim");
+		setTitle("Delivery Driver Simulator 2k23");
 		setSize(1000, 1200);
 		
 		setLocationRelativeTo(null);

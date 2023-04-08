@@ -24,6 +24,7 @@ import java.util.Random;
 
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
+import javax.print.DocFlavor.URL;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -39,7 +40,7 @@ public class Road extends JPanel implements ActionListener {
 	private Timer timer;
 	private Truck truck;
 	private final int DELAY = 1;
-	private String imgURL = "src/resources/road.png";
+	private String imgURL = "/road.png";
 	private Image scaled;
 	private List<Package> packages;
 	private List<Pedestrian> peds;
@@ -80,7 +81,8 @@ public class Road extends JPanel implements ActionListener {
 		truck = new Truck(400, 700);
 		
 		Image img;
-		ImageIcon icon = new ImageIcon(imgURL); 
+		java.net.URL url = Road.class.getResource(imgURL);
+		ImageIcon icon = new ImageIcon(url); 
 		
 		img = icon.getImage();
 		
@@ -247,7 +249,7 @@ public class Road extends JPanel implements ActionListener {
 				if (r2.intersects(r) || r2.intersects(r)) {
 					packages.remove(i);
 					collected = collected + 1;
-					playSound("ding.wav");
+					playSound("/ding.wav");
 				} 
 			} 
 			
@@ -262,7 +264,7 @@ public class Road extends JPanel implements ActionListener {
 				if (r2.intersects(r) || r2.intersects(r)) {
 					peds.remove(i);
 					hit = hit + 1;
-					playSound("hit.wav");
+					playSound("/hit.wav");
 				} 
 			} 
 			
@@ -287,7 +289,7 @@ public class Road extends JPanel implements ActionListener {
 						peds.remove(k);
 						miss.get(i).setVisible(false);
 						destroyedPeds = destroyedPeds + 1;
-						playSound("destroyed_ped.wav");
+						playSound("/destroyed_ped.wav");
 					}
 					
 				}
@@ -300,7 +302,7 @@ public class Road extends JPanel implements ActionListener {
 		score.setText("<html><h1><font color='red'>Packages Collected: " + collected + "</font></h1></html>");
 		back.setVisible(true);
         
-		playSound("gameover.wav");
+		playSound("/gameover.wav");
     }
 	
 	private void inGame() {
@@ -322,8 +324,8 @@ public class Road extends JPanel implements ActionListener {
 	}
 	
 	public void playSound(String soundFile) throws MalformedURLException, UnsupportedAudioFileException, IOException, LineUnavailableException {
-	    File f = new File("./src/resources/" + soundFile);
-	    AudioInputStream audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());  
+	    java.net.URL url = Road.class.getResource(soundFile);
+	    AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);  
 	    Clip clip = AudioSystem.getClip();
 	    clip.open(audioIn);
 	    clip.start();

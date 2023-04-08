@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Built-By: Cammy
+Build-Jdk: 17.0.5
+Main-Class: game.Application
+Created-By: Maven Integration for Eclipse
+

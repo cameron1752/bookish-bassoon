@@ -36,7 +36,7 @@ public class Truck extends Sprite{
 	private Image image;
 	
 	// image uri
-	private String imgPath = "src/resources/truck.png";
+	private String imgPath = "/truck.png";
 	
 	// missiles
 	private List<Missle> miss;
@@ -56,7 +56,8 @@ public class Truck extends Sprite{
 	}
 	
 	private void loadImage() {
-		ImageIcon imgI = new ImageIcon(imgPath);
+		java.net.URL url = Road.class.getResource(imgPath);
+		ImageIcon imgI = new ImageIcon(url);
 		image = imgI.getImage();
 		
 		w = image.getWidth(null);
@@ -103,7 +104,7 @@ public class Truck extends Sprite{
 	public void fire() {
 		 miss.add(new Missle(x + (w / 2), y + height / 2));
 		 try {
-			playSound("missle_shoot.wav");
+			playSound("/missle_shoot.wav");
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -170,8 +171,8 @@ public class Truck extends Sprite{
     }
     
 	public void playSound(String soundFile) throws MalformedURLException, UnsupportedAudioFileException, IOException, LineUnavailableException {
-	    File f = new File("./src/resources/" + soundFile);
-	    AudioInputStream audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());  
+	    java.net.URL url = Road.class.getResource(soundFile);
+	    AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);  
 	    Clip clip = AudioSystem.getClip();
 	    clip.open(audioIn);
 	    clip.start();

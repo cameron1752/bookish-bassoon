@@ -27,13 +27,14 @@ public class Missle extends Sprite {
 			private Image image;
 			
 			// image uri
-			private String imgPath = "src/resources/missile.png";
+			private String imgPath = "/missile.png";
 			
 			
 			
 			
 			private void loadImage() {
-				ImageIcon imgI = new ImageIcon(imgPath);
+				java.net.URL url = Road.class.getResource(imgPath);
+				ImageIcon imgI = new ImageIcon(url);
 				image = imgI.getImage();
 				
 				w = image.getWidth(null);
